@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Jarvis - Agent CLI Wrapper
+
+show_help() {
+    echo "Usage: ./jarvis [COMMAND]"
+    echo ""
+    echo "Commands:"
+    echo "  up      Build and start the agent in the background"
+    echo "  down    Stop the agent"
+    echo "  logs    View the logs of the agent"
+    echo "  help    Show this help message"
+}
+
+if [ "$1" == "up" ]; then
+    echo "Starting Agentic Apply (Jarvis) in the background..."
+    docker compose up -d --build
+elif [ "$1" == "down" ]; then
+    echo "Stopping Jarvis..."
+    docker compose down
+elif [ "$1" == "logs" ]; then
+    docker compose logs -f
+else
+    show_help
+fi
