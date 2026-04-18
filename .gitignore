@@ -12,6 +12,7 @@ venv/
 credentials.json
 token.json
 agent_memory.db
+agentic_apply.db
 uploads/
 
 # OS

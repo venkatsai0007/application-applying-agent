@@ -6,7 +6,7 @@ from .memory import MemoryBank
 from .platforms.indeed import IndeedScraper
 
 class JobApplicationAgent:
-    def __init__(self, config: dict, resume_data: dict, sheet_manager=None):
+    def __init__(self, config: dict, resume_data: dict, sheet_manager=None, ai_config: dict = None):
         self.config = config
         self.resume_data = resume_data
         self.sheet_manager = sheet_manager
@@ -15,7 +15,7 @@ class JobApplicationAgent:
         self.page = None
         self.question_queue = [] # Shared with FastAPI
         
-        self.llm = LLMManager()
+        self.llm = LLMManager(ai_config=ai_config)
         self.memory = MemoryBank(llm_manager=self.llm)
 
     async def initialize(self):
@@ -30,10 +30,16 @@ class JobApplicationAgent:
     async def search_jobs(self, platform: str = "Indeed"):
         print(f"Searching jobs on {platform}...")
         
-        job_titles = self.config.get('job_titles', 'Software Engineer').split(',')
-        locations = self.config.get('locations', 'India').split(',')
-        title = job_titles[0].strip()
-        location = locations[0].strip()
+        job_titles = self.config.get('job_titles', ['Software Engineer'])
+        if isinstance(job_titles, str):
+            job_titles = [t.strip() for t in job_titles.split(',')]
+            
+        locations = self.config.get('locations', ['India'])
+        if isinstance(locations, str):
+            locations = [l.strip() for l in locations.split(',')]
+            
+        title = job_titles[0] if job_titles else "Software Engineer"
+        location = locations[0] if locations else "India"
 
         if platform == "Indeed":
             scraper = IndeedScraper(self.page, self.config, self.resume_data, self.memory, self.llm, self.sheet_manager, self.question_queue)
